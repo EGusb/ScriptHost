@@ -23,7 +23,7 @@ class Host(BaseModel):
         return v
 
     @validator('port')
-    def port_range(cls, v):
+    def port_in_valid_range(cls, v):
         if v not in range(1, 65536):
             raise ValueError("Invalid TCP Port. It must be an integer between 1 and 65535.")
         return v
