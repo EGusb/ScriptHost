@@ -16,6 +16,8 @@ async def root():
 if __name__ == "__main__":
     uvicorn.run(
         "main:app",
-        port=os.environ.get('APP_TCP_PORT', 3000),
+        host=os.environ.get('APP_HOST', 'localhost'),
+        port=int(os.environ.get('APP_TCP_PORT', 3000)),
         log_level=os.environ.get('APP_LOG_LEVEL', 'info'),
+        reload=os.environ.get('APP_AUTO_RELOAD', 'True') == 'True',
     )
