@@ -2,8 +2,8 @@ import os
 import uvicorn
 
 from datetime import datetime
-from fastapi import FastAPI
 from dotenv import load_dotenv
+from fastapi import FastAPI
 
 load_dotenv()
 app = FastAPI()
