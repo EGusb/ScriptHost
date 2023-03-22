@@ -1,11 +1,13 @@
 import os
 import uvicorn
+import functions
 
 import data
 
 from datetime import datetime
 from dotenv import load_dotenv
 from fastapi import FastAPI
+from ping3 import ping
 
 load_dotenv()
 app = FastAPI()
@@ -19,6 +21,21 @@ async def root():
 @app.get("/hosts")
 async def read_param():
     return data.hosts
+
+
+@app.get("/ping/{ip_addr}")
+async def ping_host(ip_addr: str, amount: int = 3):
+    if functions.is_ipv4_address(ip_addr) or functions.is_ipv6_address(ip_addr):
+        host = {
+            'host': ip_addr,
+            'pings': [],
+        }
+        for i in range(0, amount):
+            res = ping(ip_addr, unit='ms')
+            host['pings'].append(res)
+        return host
+    else:
+        return {'error': 'invalid IP address.'}
 
 
 if __name__ == "__main__":
