@@ -4,6 +4,7 @@ import re
 
 from datetime import datetime
 from netmiko import ConnectHandler
+from ping3 import ping
 from cryptography.hazmat.primitives.asymmetric import dsa
 
 
@@ -59,6 +60,10 @@ def is_ipv6_address(ip: str) -> bool:
 
 def is_mac_address(mac: str) -> bool:
     return bool(re.match("[0-9a-f]{2}([-:]?)[0-9a-f]{2}(\\1[0-9a-f]{2}){4}$", mac.lower()))
+
+
+async def ping_host(host):
+    return ping(host, unit='ms')
 
 
 def start_log(file, log_path, ext='log', msg_fmt='{message}', datefmt='%Y/%m/%d %H:%M:%S', level=log.INFO):

@@ -31,8 +31,8 @@ async def ping_host(ip_addr: str, amount: int = 3):
             'pings': [],
         }
         for i in range(0, amount):
-            res = ping(ip_addr, unit='ms')
-            host['pings'].append(res)
+            res = await functions.ping_host(ip_addr)
+            host['pings'].append({False: 'error', None: 'timeout'}.get(res, res))
         return host
     else:
         return {'error': 'invalid IP address.'}
