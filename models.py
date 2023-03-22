@@ -19,11 +19,11 @@ class CommandTemplate(BaseModel):
 
     def get_cmd(self, kwargs: dict, wait_after: int = 0) -> tuple:
         """
-        Replaces all the parameters sent as arguments in the command template so as to get the full command with values
+        Replaces all the parameters sent as arguments in the command template to get the full command with values
 
         :param kwargs: A dictionary containing the parameters to replace and their values
         :param wait_after: The time in milliseconds that the host should wait after executing this command.
-        :return: A tuple containing the final command as the first arg, and the time to wait in ms as second arg.
+        :returns: A tuple containing the final command as the first arg, and the time to wait in ms as second arg.
         Returns None if there is an error.
         """
         params = self.dict().get('params', [])
