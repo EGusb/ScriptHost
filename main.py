@@ -1,6 +1,7 @@
 import os
 import uvicorn
 
+from datetime import datetime
 from fastapi import FastAPI
 from dotenv import load_dotenv
 
@@ -11,6 +12,11 @@ app = FastAPI()
 @app.get("/")
 async def root():
     return {"message": "Hello World", "status": "FAILURE"}
+
+
+@app.get("/{param}")
+async def read_param(param: str):
+    return {"parameter": param, "timestamp": datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
 
 
 if __name__ == "__main__":
