@@ -48,12 +48,6 @@ class Script(BaseModel):
     commands: list[CommandTemplate] = []
     "The list of command templates to be executed."
 
-    @validator('commands')
-    def list_of_commands(cls, v):
-        for el in v:
-            assert isinstance(el, CommandTemplate)
-        return v
-
     def get_cmds(self, kwargs: dict) -> tuple:
         """
         Replaces all the parameters sent as arguments in each of the command templates.
@@ -74,6 +68,7 @@ class Host(BaseModel):
     ip_address: str
     port: int
     mac_address = ''
+    scripts: list[Script] = []
 
     @validator('ip_address')
     def is_ip_address(cls, v):
