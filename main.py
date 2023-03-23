@@ -7,7 +7,6 @@ import data
 from datetime import datetime
 from dotenv import load_dotenv
 from fastapi import FastAPI
-from ping3 import ping
 
 load_dotenv()
 app = FastAPI()
