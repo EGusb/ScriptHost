@@ -18,7 +18,15 @@ templates = Jinja2Templates(directory="templates")
 
 @app.get("/")
 async def home(request: Request):
-    return templates.TemplateResponse('home.html', {'request': request})
+    return templates.TemplateResponse(
+        'home.html',
+        {
+            'request': request,
+            'items': list(data.routes.keys()),
+            'route_curr': '/',
+            'route_prev': None,
+            'title': 'Home',
+        })
 
 
 @app.get("/{route}", response_class=HTMLResponse)
@@ -29,6 +37,8 @@ async def read_hosts(request: Request, route: str):
             {
                 'request': request,
                 'items': data.routes[route],
+                'route_curr': route,
+                'route_prev': '/',
                 'title': route.capitalize(),
             })
     else:
@@ -37,14 +47,18 @@ async def read_hosts(request: Request, route: str):
 
 @app.get("/{route}/{index}", response_class=HTMLResponse)
 async def read_host(request: Request, route: str, index: int):
-    host = data.hosts[index] if index in range(0, len(data.hosts)) else {'error': 'Host not found.'}
-    return templates.TemplateResponse(
-        'detail.html',
-        {
-            'request': request,
-            'content': host,
-            'title': host.name if 'name' in dict(host) else 'Error',
-        })
+    if route in data.routes:
+        items = data.routes[route]
+        item = items[index] if index in range(0, len(items)) else {'error': 'Item not found.'}
+        return templates.TemplateResponse(
+            'detail.html',
+            {
+                'request': request,
+                'content': item,
+                'title': item.name if 'name' in dict(item) else 'Error',
+            })
+    else:
+        return RedirectResponse('/', status_code=303)
 
 
 @app.get("/ping/{ip_addr}")
