@@ -49,13 +49,15 @@ async def read_hosts(request: Request, route: str):
 async def read_host(request: Request, route: str, index: int):
     if route in data.routes:
         items = data.routes[route]
-        item = items[index] if index in range(0, len(items)) else {'error': 'Item not found.'}
+        item = dict(items[index]) if index in range(0, len(items)) else {'error': 'Item not found.'}
         return templates.TemplateResponse(
             'detail.html',
             {
                 'request': request,
                 'content': item,
-                'title': item.name if 'name' in dict(item) else 'Error',
+                'route_curr': f"{route}/{index}",
+                'route_prev': f"/{route}",
+                'title': item['name'] if 'name' in dict(item) else 'Error',
             })
     else:
         return RedirectResponse('/', status_code=303)
