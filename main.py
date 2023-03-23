@@ -6,20 +6,25 @@ import data
 
 from datetime import datetime
 from dotenv import load_dotenv
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 
 load_dotenv()
 app = FastAPI()
+app.mount("/static", StaticFiles(directory="static"), name="static")
+templates = Jinja2Templates(directory="templates")
 
 
 @app.get("/")
 async def root():
-    return {"message": "Hello World", "timestamp": datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+    return {'message': 'Hello World', 'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
 
 
-@app.get("/hosts")
-async def read_param():
-    return data.hosts
+@app.get("/hosts", response_class=HTMLResponse)
+async def read_hosts(request: Request):
+    return templates.TemplateResponse('list.html', {'request': request, 'items': data.hosts, 'title': 'Hosts'})
 
 
 @app.get("/ping/{ip_addr}")
