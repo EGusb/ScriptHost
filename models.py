@@ -69,7 +69,6 @@ class Script(BaseModel):
 class Host(BaseModel):
     name: str
     ip_address: str
-    port: int
     mac_address = ''
     scripts: list[Script] = []
 
@@ -83,12 +82,6 @@ class Host(BaseModel):
     def is_mac_address(cls, v):
         if not functions.is_mac_address(v):
             raise ValueError("Invalid MAC address.")
-        return v
-
-    @validator('port')
-    def port_in_valid_range(cls, v):
-        if v not in range(1, 65536):
-            raise ValueError("Invalid TCP Port. It must be an integer between 1 and 65535.")
         return v
 
     def ping(self):
