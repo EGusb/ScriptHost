@@ -95,6 +95,3 @@ class Host(BaseModel):
         if res is None:
             return 'timeout'
         return res
-
-    def __str__(self):
-        return self.name
