@@ -62,6 +62,9 @@ class Script(BaseModel):
             yield cmd_str
             sleep(wait / 1000)
 
+    def __str__(self):
+        return self.name
+
 
 class Host(BaseModel):
     name: str
