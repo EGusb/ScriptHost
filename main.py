@@ -4,10 +4,9 @@ import functions
 
 import data
 
-from datetime import datetime
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
@@ -18,13 +17,34 @@ templates = Jinja2Templates(directory="templates")
 
 
 @app.get("/")
-async def root():
-    return {'message': 'Hello World', 'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+async def home(request: Request):
+    return templates.TemplateResponse('home.html', {'request': request})
 
 
-@app.get("/hosts", response_class=HTMLResponse)
-async def read_hosts(request: Request):
-    return templates.TemplateResponse('list.html', {'request': request, 'items': data.hosts, 'title': 'Hosts'})
+@app.get("/{route}", response_class=HTMLResponse)
+async def read_hosts(request: Request, route: str):
+    if route in data.routes:
+        return templates.TemplateResponse(
+            'list.html',
+            {
+                'request': request,
+                'items': data.routes[route],
+                'title': route.capitalize(),
+            })
+    else:
+        return RedirectResponse('/', status_code=303)
+
+
+@app.get("/{route}/{index}", response_class=HTMLResponse)
+async def read_host(request: Request, route: str, index: int):
+    host = data.hosts[index] if index in range(0, len(data.hosts)) else {'error': 'Host not found.'}
+    return templates.TemplateResponse(
+        'detail.html',
+        {
+            'request': request,
+            'content': host,
+            'title': host.name if 'name' in dict(host) else 'Error',
+        })
 
 
 @app.get("/ping/{ip_addr}")

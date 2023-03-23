@@ -8,20 +8,17 @@
 
 <div class="box" id="heading">
     <div>
-        <a href="/" class="left-btn"><i class="fa-solid fa-chevron-left"></i></a>
+        <a href="/hosts" class="left-btn"><i class="fa-solid fa-chevron-left"></i></a>
         <h1>{{ title }}</h1>
     </div>
 </div>
 
 <div class="box">
     <div class="container-fluid">
-        {% for i in range(items|length) %}
+        {% for k, v in dict(content).items() %}
         <div class="item row">
-            <p class="col-9"><a href="/hosts/{{ i }}">{{ items[i] }}</a></p>
-        </div>
-        {% else %}
-        <div class="item row">
-            <p class="col-9">No items!</p>
+            <p class="col-6">{{ k }}</p>
+            <p class="col-6">{{ v }}</p>
         </div>
         {% endfor %}
     </div>

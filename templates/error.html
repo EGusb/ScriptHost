@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ title }}
+{% endblock %}
+
+{% block body %}
+
+<div class="box" id="heading">
+  <div>
+    <a href="/" class="left-btn"><i class="fa-solid fa-chevron-left"></i></a>
+    <h1>ERROR <%= statusCode %></h1>
+  </div>
+</div>
+
+<div class="box">
+  <div class="item">
+    <h4 class="m-auto">{% content %}</h4>
+  </div>
+</div>
+
+{% endblock %}
