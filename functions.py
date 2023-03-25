@@ -1,11 +1,11 @@
-import logging as log
 import ipaddress
+import logging as log
 import re
 
+from cryptography.hazmat.primitives.asymmetric import dsa
 from datetime import datetime
 from netmiko import ConnectHandler
 from ping3 import ping
-from cryptography.hazmat.primitives.asymmetric import dsa
 
 
 def _override_check_dsa_parameters(parameters):
