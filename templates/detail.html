@@ -8,7 +8,9 @@
 
 <div class="box" id="heading">
     <div>
+        {% if route_prev %}
         <a href="{{ route_prev }}" class="left-btn"><i class="fa-solid fa-chevron-left"></i></a>
+        {% endif %}
         <h1>{{ title }}</h1>
     </div>
 </div>
