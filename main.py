@@ -30,7 +30,7 @@ async def home(request: Request):
 
 
 @app.get("/hosts", response_class=HTMLResponse)
-async def read_hosts(request: Request):
+async def get_hosts(request: Request):
     return templates.TemplateResponse(
         'list.html',
         {
@@ -43,7 +43,7 @@ async def read_hosts(request: Request):
 
 
 @app.get("/hosts/{host_id}", response_class=HTMLResponse)
-async def read_host(request: Request, host_id: int):
+async def get_host(request: Request, host_id: int):
     hosts = data.hosts
     if host_id in range(0, len(hosts)):
         host = hosts[host_id]
