@@ -53,7 +53,7 @@ async def get_host(request: Request, host_id: int):
                 'request': request,
                 'content': host,
                 'route_curr': f"hosts/{host_id}",
-                'route_prev': f"/hosts",
+                'route_prev': '/hosts',
                 'title': host.name,
             })
     else:
@@ -63,7 +63,7 @@ async def get_host(request: Request, host_id: int):
                 'request': request,
                 'content': {'message': 'Host not found.', 'status_code': 404},
                 'route_curr': f"hosts/{host_id}",
-                'route_prev': f"/hosts",
+                'route_prev': '/hosts',
                 'title': 'Error 404',
             },
             status_code=404
