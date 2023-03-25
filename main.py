@@ -29,56 +29,45 @@ async def home(request: Request):
         })
 
 
-@app.get("/{route}", response_class=HTMLResponse)
-async def read_hosts(request: Request, route: str):
-    if route in data.routes:
+@app.get("/hosts", response_class=HTMLResponse)
+async def read_hosts(request: Request):
+    return templates.TemplateResponse(
+        'list.html',
+        {
+            'request': request,
+            'items': data.hosts,
+            'route_curr': "hosts",
+            'route_prev': '/',
+            'title': 'Hosts',
+        })
+
+
+@app.get("/hosts/{host_id}", response_class=HTMLResponse)
+async def read_host(request: Request, host_id: int):
+    hosts = data.hosts
+    if host_id in range(0, len(hosts)):
+        host = hosts[host_id]
         return templates.TemplateResponse(
-            'list.html',
+            'detail.html',
             {
                 'request': request,
-                'items': data.routes[route],
-                'route_curr': route,
-                'route_prev': '/',
-                'title': route.capitalize(),
+                'content': host,
+                'route_curr': f"hosts/{host_id}",
+                'route_prev': f"/hosts",
+                'title': host.name,
             })
     else:
         return templates.TemplateResponse(
             'detail.html',
             {
                 'request': request,
-                'content': {'message': 'Route not found.', 'code': 404},
-                'route_curr': f"{route}",
-                'route_prev': '/',
-                'title': 'Error',
+                'content': {'message': 'Host not found.', 'status_code': 404},
+                'route_curr': f"hosts/{host_id}",
+                'route_prev': f"/hosts",
+                'title': 'Error 404',
             },
-            status_code=404)
-
-
-@app.get("/{route}/{index}", response_class=HTMLResponse)
-async def read_host(request: Request, route: str, index: int):
-    if route in data.routes:
-        items = data.routes[route]
-        item = dict(items[index]) if index in range(0, len(items)) else {'error': 'Item not found.'}
-        return templates.TemplateResponse(
-            'detail.html',
-            {
-                'request': request,
-                'content': item,
-                'route_curr': f"{route}/{index}",
-                'route_prev': f"/{route}",
-                'title': item['name'] if 'name' in dict(item) else 'Error',
-            })
-    else:
-        return templates.TemplateResponse(
-            'detail.html',
-            {
-                'request': request,
-                'content': {'message': 'Route not found.', 'code': 404},
-                'route_curr': f"{route}/{index}",
-                'route_prev': '/',
-                'title': 'Error',
-            },
-            status_code=404)
+            status_code=404
+        )
 
 
 @app.get("/ping/{ip_addr}")
