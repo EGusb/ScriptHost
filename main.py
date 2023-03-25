@@ -42,7 +42,16 @@ async def read_hosts(request: Request, route: str):
                 'title': route.capitalize(),
             })
     else:
-        return RedirectResponse('/', status_code=303)
+        return templates.TemplateResponse(
+            'detail.html',
+            {
+                'request': request,
+                'content': {'message': 'Route not found.', 'code': 404},
+                'route_curr': f"{route}",
+                'route_prev': '/',
+                'title': 'Error',
+            },
+            status_code=404)
 
 
 @app.get("/{route}/{index}", response_class=HTMLResponse)
@@ -60,7 +69,16 @@ async def read_host(request: Request, route: str, index: int):
                 'title': item['name'] if 'name' in dict(item) else 'Error',
             })
     else:
-        return RedirectResponse('/', status_code=303)
+        return templates.TemplateResponse(
+            'detail.html',
+            {
+                'request': request,
+                'content': {'message': 'Route not found.', 'code': 404},
+                'route_curr': f"{route}/{index}",
+                'route_prev': '/',
+                'title': 'Error',
+            },
+            status_code=404)
 
 
 @app.get("/ping/{ip_addr}")
