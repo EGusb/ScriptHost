@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
-from typing import List
+from typing import List, Optional
 
 load_dotenv()
 app = FastAPI()
@@ -29,14 +29,14 @@ async def home(request: Request):
         })
 
 
-@app.get("/hosts", response_model=List[models.Host])  # response_class=HTMLResponse)
+@app.get("/hosts")
 async def get_hosts():
     with sqlmodel.Session(models.engine) as session:
         heroes = session.exec(sqlmodel.select(models.Host)).all()
         return heroes
 
 
-@app.get("/hosts/{host_id}", response_model=models.Host)
+@app.get("/hosts/{host_id}")
 async def get_host(host_id: int):
     with sqlmodel.Session(models.engine) as session:
         host = session.get(models.Host, host_id)
