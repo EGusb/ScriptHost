@@ -1,8 +1,10 @@
 import functions
-
+import os
 from time import sleep
 from pydantic import BaseModel, validator
 from ping3 import ping
+from sqlmodel import Field, SQLModel, create_engine
+from typing import Optional
 
 
 class CommandTemplate(BaseModel):
@@ -66,23 +68,24 @@ class Script(BaseModel):
         return self.name
 
 
-class Host(BaseModel):
-    name: str
+class Host(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    name: str = Field(unique=True)
     ip_address: str
-    mac_address = ''
-    scripts: list[Script] = []
+    mac_address: Optional[str] = None
+    # scripts: list[Script] = []
 
-    @validator('ip_address')
-    def is_ip_address(cls, v):
-        if not functions.is_ipv4_address(v) and not functions.is_ipv6_address(v):
-            raise ValueError("Invalid IP address. It must be either an IPv4 or IPv6 address.")
-        return v
-
-    @validator('mac_address')
-    def is_mac_address(cls, v):
-        if not functions.is_mac_address(v):
-            raise ValueError("Invalid MAC address.")
-        return v
+    # @validator('ip_address')
+    # def is_ip_address(cls, v):
+    #     if not functions.is_ipv4_address(v) and not functions.is_ipv6_address(v):
+    #         raise ValueError("Invalid IP address. It must be either an IPv4 or IPv6 address.")
+    #     return v
+    #
+    # @validator('mac_address')
+    # def is_mac_address(cls, v):
+    #     if v is not None and not functions.is_mac_address(v):
+    #         raise ValueError("Invalid MAC address.")
+    #     return v
 
     def ping(self):
         res = ping(self.ip_address, unit='ms')
@@ -94,3 +97,19 @@ class Host(BaseModel):
 
     def __str__(self):
         return f"{self.name} ({self.ip_address})"
+
+
+DATABASE_URL = os.environ.get('DATABASE_URL', 'sqlite:///./database.sqlite')
+engine = create_engine(DATABASE_URL, echo=True)
+
+
+def create_db_and_tables():
+    SQLModel.metadata.create_all(engine)
+
+
+def main():
+    create_db_and_tables()
+
+
+if __name__ == "__main__":
+    main()

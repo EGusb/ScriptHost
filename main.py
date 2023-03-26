@@ -1,14 +1,14 @@
+import functions
+import models
 import os
 import uvicorn
-import functions
-
-import data
+import sqlmodel
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from typing import List
 
 load_dotenv()
 app = FastAPI()
@@ -22,52 +22,25 @@ async def home(request: Request):
         'home.html',
         {
             'request': request,
-            'items': list(data.routes.keys()),
+            'items': ['hosts', 'tests'],
             'route_curr': '/',
             'route_prev': None,
             'title': 'Home',
         })
 
 
-@app.get("/hosts", response_class=HTMLResponse)
-async def get_hosts(request: Request):
-    return templates.TemplateResponse(
-        'list.html',
-        {
-            'request': request,
-            'items': data.hosts,
-            'route_curr': "hosts",
-            'route_prev': '/',
-            'title': 'Hosts',
-        })
+@app.get("/hosts", response_model=List[models.Host])  # response_class=HTMLResponse)
+async def get_hosts():
+    with sqlmodel.Session(models.engine) as session:
+        heroes = session.exec(sqlmodel.select(models.Host)).all()
+        return heroes
 
 
-@app.get("/hosts/{host_id}", response_class=HTMLResponse)
-async def get_host(request: Request, host_id: int):
-    hosts = data.hosts
-    if host_id in range(0, len(hosts)):
-        host = hosts[host_id]
-        return templates.TemplateResponse(
-            'detail.html',
-            {
-                'request': request,
-                'content': host,
-                'route_curr': f"hosts/{host_id}",
-                'route_prev': '/hosts',
-                'title': host.name,
-            })
-    else:
-        return templates.TemplateResponse(
-            'detail.html',
-            {
-                'request': request,
-                'content': {'message': 'Host not found.', 'status_code': 404},
-                'route_curr': f"hosts/{host_id}",
-                'route_prev': '/hosts',
-                'title': 'Error 404',
-            },
-            status_code=404
-        )
+@app.get("/hosts/{host_id}", response_model=models.Host)
+async def get_host(host_id: int):
+    with sqlmodel.Session(models.engine) as session:
+        host = session.get(models.Host, host_id)
+        return host if host else []
 
 
 @app.get("/ping/{ip_addr}")
