@@ -80,17 +80,17 @@ class Host(SQLModel, table=True):
 
     # scripts: list[Script] = []
 
-    # @validator('ip_address')
-    # def is_ip_address(cls, v):
-    #     if not functions.is_ipv4_address(v) and not functions.is_ipv6_address(v):
-    #         raise ValueError("Invalid IP address. It must be either an IPv4 or IPv6 address.")
-    #     return v
-    #
-    # @validator('mac_address')
-    # def is_mac_address(cls, v):
-    #     if v is not None and not functions.is_mac_address(v):
-    #         raise ValueError("Invalid MAC address.")
-    #     return v
+    @validator('ip_address')
+    def is_ip_address(cls, v):
+        if not functions.is_ipv4_address(v) and not functions.is_ipv6_address(v):
+            raise ValueError("Invalid IP address. It must be either an IPv4 or IPv6 address.")
+        return v
+
+    @validator('mac_address')
+    def is_mac_address(cls, v):
+        if v is not None and not functions.is_mac_address(v):
+            raise ValueError("Invalid MAC address.")
+        return v
 
     def ping(self):
         res = ping(self.ip_address, unit='ms')
