@@ -1,3 +1,7 @@
+from dotenv import load_dotenv
+
+load_dotenv()
+
 import functions
 import os
 from time import sleep
@@ -73,6 +77,7 @@ class Host(SQLModel, table=True):
     name: str = Field(unique=True)
     ip_address: str
     mac_address: Optional[str] = None
+
     # scripts: list[Script] = []
 
     # @validator('ip_address')
@@ -100,7 +105,7 @@ class Host(SQLModel, table=True):
 
 
 DATABASE_URL = os.environ.get('DATABASE_URL', 'sqlite:///./database.sqlite')
-engine = create_engine(DATABASE_URL, echo=True)
+engine = create_engine(DATABASE_URL, echo=os.environ.get('ENGINE_ECHO', 'True') == 'True')
 
 
 def create_db_and_tables():
