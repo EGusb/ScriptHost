@@ -6,8 +6,10 @@ import sqlmodel
 
 from dotenv import load_dotenv
 from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from sqlalchemy.exc import IntegrityError
 from typing import List, Optional
 
 load_dotenv()
@@ -36,11 +38,77 @@ async def get_hosts():
         return heroes
 
 
+@app.post("/hosts")
+async def create_host(hosts: List[models.Host]):
+    with sqlmodel.Session(models.engine) as session:
+        try:
+            for host in hosts:
+                session.add(host)
+
+            session.commit()
+
+            for host in hosts:
+                session.refresh(host)
+
+            return hosts
+
+        except IntegrityError as e:
+            return JSONResponse(
+                status_code=409,
+                content={
+                    'error': f"{type(e).__name__}: " + str(e).replace('\n', ' '),
+                    'status_code': 409
+                }
+            )
+
+
+@app.delete("/hosts")
+async def delete_hosts():
+    with sqlmodel.Session(models.engine) as session:
+        try:
+            deleted_hosts = []
+            hosts = session.exec(sqlmodel.select(models.Host))
+            for host in hosts:
+                deleted_hosts.append(host.dict())
+                session.delete(host)
+
+            session.commit()
+            return deleted_hosts
+
+        except Exception as e:
+            return JSONResponse(
+                status_code=400,
+                content={
+                    'error': f"{type(e).__name__}: " + str(e).replace('\n', ' '),
+                    'status_code': 400
+                }
+            )
+
+
 @app.get("/hosts/{host_id}")
 async def get_host(host_id: int):
     with sqlmodel.Session(models.engine) as session:
         host = session.get(models.Host, host_id)
         return host if host else []
+
+
+@app.delete("/hosts/{host_id}")
+async def delete_host(host_id: int):
+    with sqlmodel.Session(models.engine) as session:
+        try:
+            host = session.get(models.Host, host_id)
+            session.delete(host)
+            session.commit()
+            return host
+
+        except Exception as e:
+            return JSONResponse(
+                status_code=400,
+                content={
+                    'error': f"{type(e).__name__}: " + str(e).replace('\n', ' '),
+                    'status_code': 400
+                }
+            )
 
 
 @app.get("/ping/{ip_addr}")
