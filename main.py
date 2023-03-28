@@ -97,9 +97,18 @@ async def delete_host(host_id: int):
     with sqlmodel.Session(models.engine) as session:
         try:
             host = session.get(models.Host, host_id)
-            session.delete(host)
-            session.commit()
-            return host
+            if host:
+                session.delete(host)
+                session.commit()
+                return host
+            else:
+                return JSONResponse(
+                    status_code=404,
+                    content={
+                        'error': 'Host not found.',
+                        'status_code': 404
+                    }
+                )
 
         except Exception as e:
             return JSONResponse(
