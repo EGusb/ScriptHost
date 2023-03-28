@@ -10,7 +10,6 @@ from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.exc import IntegrityError
-from typing import List, Optional
 
 load_dotenv()
 app = FastAPI()
@@ -31,15 +30,15 @@ async def home(request: Request):
         })
 
 
-@app.get("/hosts")
+@app.get("/hosts", response_model=list[models.Host])
 async def get_hosts():
     with sqlmodel.Session(models.engine) as session:
         heroes = session.exec(sqlmodel.select(models.Host)).all()
         return heroes
 
 
-@app.post("/hosts")
-async def create_host(hosts: List[models.Host]):
+@app.post("/hosts", response_model=list[models.Host])
+async def create_host(hosts: list[models.Host]):
     with sqlmodel.Session(models.engine) as session:
         try:
             for host in hosts:
@@ -62,7 +61,7 @@ async def create_host(hosts: List[models.Host]):
             )
 
 
-@app.delete("/hosts")
+@app.delete("/hosts", response_model=list[models.Host])
 async def delete_hosts():
     with sqlmodel.Session(models.engine) as session:
         try:
@@ -85,14 +84,14 @@ async def delete_hosts():
             )
 
 
-@app.get("/hosts/{host_id}")
+@app.get("/hosts/{host_id}", response_model=list[models.Host])
 async def get_host(host_id: int):
     with sqlmodel.Session(models.engine) as session:
         host = session.get(models.Host, host_id)
-        return host if host else []
+        return [host] if host else []
 
 
-@app.delete("/hosts/{host_id}")
+@app.delete("/hosts/{host_id}", response_model=list[models.Host])
 async def delete_host(host_id: int):
     with sqlmodel.Session(models.engine) as session:
         try:
@@ -100,7 +99,7 @@ async def delete_host(host_id: int):
             if host:
                 session.delete(host)
                 session.commit()
-                return host
+                return [host]
             else:
                 return JSONResponse(
                     status_code=404,
