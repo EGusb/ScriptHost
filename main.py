@@ -31,10 +31,18 @@ async def home(request: Request):
 
 
 @app.get("/hosts", response_model=list[models.Host])
-async def get_hosts():
+async def get_hosts(request: Request):
     with sqlmodel.Session(models.engine) as session:
-        heroes = session.exec(sqlmodel.select(models.Host)).all()
-        return heroes
+        hosts = session.exec(sqlmodel.select(models.Host)).all()
+        return templates.TemplateResponse(
+            'list.html',
+            {
+                'request': request,
+                'items': hosts,
+                'route_curr': '/hosts',
+                'route_prev': '/',
+                'title': 'Hosts',
+            })
 
 
 @app.post("/hosts", response_model=list[models.Host])
@@ -128,7 +136,8 @@ async def ping_host(ip_addr: str, amount: int = 3):
         }
         for i in range(0, amount):
             res = await functions.ping_host(ip_addr)
-            host['pings'].append({False: 'error', None: 'timeout'}.get(res, res))
+            host['pings'].append(
+                {False: 'error', None: 'timeout'}.get(res, res))
         return host
     else:
         return {'error': 'invalid IP address.'}
